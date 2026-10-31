@@ -10,7 +10,6 @@
 // @grant       GM.cookie
 // @grant       GM_registerMenuCommand
 // @grant       GM_setClipboard
-// @grant       GM_download
 // @run-at      document-end
 // ==/UserScript==
 
@@ -29,7 +28,14 @@ value="${cookies}"/>
 </Configuration>
 `
   GM_setClipboard(xml)
-  GM_download("data:application/xml;base64," + btoa(xml), "strava-cookies-" + (new Date()).toISOString() + ".xml")
+  const link = document.createElement("a")
+  link.href = URL.createObjectURL(new Blob([xml], { type: "application/xml" }))
+  link.download = "strava-cookies-" + (new Date()).toISOString() + ".xml"
+  link.style.display = "none"
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  setTimeout(() => URL.revokeObjectURL(link.href))
 }
 
 GM_registerMenuCommand("Get XML with cookies for Vespucci", downloadCookies)
