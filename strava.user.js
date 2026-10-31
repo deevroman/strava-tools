@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Copy strava.com cookies
 // @description Add Download Vespucci config into dropdown menu
-// @version     0.1
+// @version     0.2
 // @author      deevroman
 // @namespace   https://github.com/deevroman/strava-tools
 // @updateURL   https://github.com/deevroman/strava-tools/raw/master/strava.user.js
@@ -15,6 +15,9 @@
 
 async function downloadCookies() {
   const cookies = (await GM.cookie.list()).map(i => `${i.name}=${i.value}`).join(";").replace('"', '&quot;')
+  if (!cookies.includes("CloudFront-Key-Pair-Id")) {
+    alert("Enable full access to HttpOnly cookies in settings")
+  }
   const xml = `<?xml version='1.0' encoding='UTF-8' ?>
 <Configuration>
     <Section name="tilelayers" table="headers"
@@ -58,7 +61,9 @@ setTimeout(async () => {
     const avatar = document.querySelector('[href^="/athletes/"]:has(img)')
     if (avatar) {
       avatar.parentElement.onclick = e => {
-        e.preventDefault()
+        if (e.target.nodeName === "DIV") {
+          e.preventDefault()
+        }
       }
       avatar.parentElement.oncontextmenu = e => {
         e.preventDefault()
