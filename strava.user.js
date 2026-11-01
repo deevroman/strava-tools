@@ -14,7 +14,14 @@
 // ==/UserScript==
 
 async function downloadCookies() {
-  const cookies = (await GM.cookie.list()).map(i => `${i.name}=${i.value}`).join(";").replace('"', '&quot;')
+  const cookies = (await GM.cookie.list())
+      .filter(i => [
+          'CloudFront-Key-Pair-Id',
+          'CloudFront-Policy',
+          'CloudFront-Signature',
+          '_strava_idcf'].includes(i.name)
+      )
+      .map(i => `${i.name}=${i.value}`).join(";").replace('"', '&quot;')
   if (!cookies.includes("CloudFront-Key-Pair-Id")) {
     alert("Enable full access to HttpOnly cookies in settings")
   }
